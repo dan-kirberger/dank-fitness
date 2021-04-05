@@ -15,7 +15,7 @@ export default function Home() {
           Welcome to DanK Fitness
         </h1>
         <p>Pick a Tool:</p>
-        <ul><li><Link href="tools/plates">Gibbens Calculator</Link></li></ul>
+        <ul><li><Link href="tools/plates">Plate Calculator</Link></li></ul>
       </main>
     </div>
   )
