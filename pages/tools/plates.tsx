@@ -131,7 +131,7 @@ export const PlateCalculator = () => {
                     {plates.map(plate => {
                         return <Grid container key={plate.weight}>
                             <Grid item xs={2}>{plate.weight}</Grid>
-                            <Grid item xs={2}><TextField value={plate.count} type="number" label="Pairs" onChange={(e) => updatePlate(plate.weight, e.target.value)} /></Grid>
+                            <Grid item xs={2}><TextField value={plate.count} type="number" label="Pairs" onChange={(e) => updatePlate(plate.weight, parseInt(e.target.value))} /></Grid>
                         </Grid>
                     })}
                 </Grid>
