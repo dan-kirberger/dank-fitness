@@ -46,11 +46,11 @@ const getSettings = () : Settings => {
         return JSON.parse(settings)
     }
     if(settings && JSON.parse(settings)?.serializationVersion !== SERIALIZATION_VERSION) {
+        console.log("Nuking your old settings!")
         localStorage.removeItem(LOCAL_STORAGE_KEY)
     }
     return null
 }
-
 
 export const PlateCalculator = () => {
     const [poundsMode, setPoundsMode] = useState(true)
@@ -63,9 +63,8 @@ export const PlateCalculator = () => {
     useEffect(() => {
         if(!settingsLoaded) {
             const settings = getSettings()
-            console.log("now lets set them", settings)
             if(settings) {
-                console.log("loading settings")
+                console.log("Loading your saved settings!")
                 setPoundsMode(settings.poundsMode)
                 setBarbellWeight(settings.barbellWeight)
                 setDesiredWeight(settings.desiredWeight)
@@ -76,7 +75,6 @@ export const PlateCalculator = () => {
     }, [settingsLoaded])
 
 
-    console.log("here i am, using", plates)
     useEffect(() => {
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({
             serializationVersion: SERIALIZATION_VERSION,
@@ -140,10 +138,10 @@ export const PlateCalculator = () => {
             </div>
 
             <p/>
-            My bar weighs:<TextField value={barbellWeight} type="number" label="Barbell Weight" onChange={(e) => setBarbellWeight(e.target.value)} />
+            My bar weighs:<TextField value={barbellWeight} type="number" label="Barbell Weight" onChange={(e) => setBarbellWeight(parseInt(e.target.value))} />
 
 <hr/>
-I need:<TextField value={desiredWeight} type="number" label="Desired Weight" onChange={(e) => setDesiredWeight(e.target.value)} />
+I need:<TextField value={desiredWeight} type="number" label="Desired Weight" onChange={(e) => setDesiredWeight(parseInt(e.target.value))} />
 <hr/>
 You need:
 <ul>
@@ -151,7 +149,7 @@ You need:
     {requiredPlates.map(requiredPlate => <li key={requiredPlate.weight}>{`${requiredPlate.count} x ${requiredPlate.weight}`}</li>)}
 </ul>
 {remainingWeightPerSide > 0 && <>
-You don't have enough plates! {remainingWeightPerSide} {poundsMode ? 'LB' : 'KG'} still needs to be added to each side.
+You don&apos;t have enough plates! {remainingWeightPerSide} {poundsMode ? 'LB' : 'KG'} still needs to be added to each side.
 </>}
 
             {/* {people.length == 0 && "Nobody added yet"}
