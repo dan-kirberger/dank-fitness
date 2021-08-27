@@ -104,7 +104,7 @@ export const PlateCalculator = () => {
     availablePlates.forEach(plateType => {
         if(remainingWeightPerSide >= plateType.weight) {
             let numberOfPairsNeeded = 1
-            for(let numberOfPairs = 1; numberOfPairs <= plateType.count && (remainingWeightPerSide >= numberOfPairs * plateType.count); numberOfPairs++) {
+            for(let numberOfPairs = 1; numberOfPairs <= plateType.count && (remainingWeightPerSide >= numberOfPairs * plateType.weight); numberOfPairs++) {
                 numberOfPairsNeeded = numberOfPairs // lets make this slicker
             }
             remainingWeightPerSide = remainingWeightPerSide - (plateType.weight * numberOfPairsNeeded)
