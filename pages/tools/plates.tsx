@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Switch from '@material-ui/core/Switch'
 import { Button, Container, Grid, TextField } from '@material-ui/core'
 import _ from 'lodash'
@@ -29,12 +29,63 @@ interface PoundPlate extends PlateType {
     weight: 2.5 | 5 | 10 | 25 | 45
 }
 
+interface Settings {
+    serializationVersion: number
+    poundsMode: boolean
+    plates: PlateType[]
+    barbellWeight: number
+    desiredWeight: number
+}
+
+const SERIALIZATION_VERSION = 1
+const LOCAL_STORAGE_KEY = 'plateCalculatorSettings'
+
+const getSettings = () : Settings => {
+    const settings = localStorage?.getItem(LOCAL_STORAGE_KEY)
+    if(settings && JSON.parse(settings)?.serializationVersion === SERIALIZATION_VERSION) {
+        return JSON.parse(settings)
+    }
+    if(settings && JSON.parse(settings)?.serializationVersion !== SERIALIZATION_VERSION) {
+        localStorage.removeItem(LOCAL_STORAGE_KEY)
+    }
+    return null
+}
+
+
 export const PlateCalculator = () => {
     const [poundsMode, setPoundsMode] = useState(true)
     const [people, setPeople] = useState([])
     const [plates, setPlates] = useState(generatePlates(poundsMode))
     const [barbellWeight, setBarbellWeight] = useState(poundsMode ? 45 : 20)
     const [desiredWeight, setDesiredWeight] = useState(poundsMode ? 135 : 75)
+    const [settingsLoaded, setSettingsLoaded] = useState(false)
+
+    useEffect(() => {
+        if(!settingsLoaded) {
+            const settings = getSettings()
+            console.log("now lets set them", settings)
+            if(settings) {
+                console.log("loading settings")
+                setPoundsMode(settings.poundsMode)
+                setBarbellWeight(settings.barbellWeight)
+                setDesiredWeight(settings.desiredWeight)
+                setPlates(settings.plates)
+            }
+            setSettingsLoaded(true)
+        }
+    }, [settingsLoaded])
+
+
+    console.log("here i am, using", plates)
+    useEffect(() => {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({
+            serializationVersion: SERIALIZATION_VERSION,
+            plates: plates,
+            poundsMode: poundsMode,
+            barbellWeight: barbellWeight,
+            desiredWeight: desiredWeight
+        }))
+    }, [plates, barbellWeight, desiredWeight, poundsMode])
 
     const updatePlate = (weight, newCount) => {
         const updatedPlates = plates.map(existingPlate => {
@@ -100,7 +151,7 @@ You need:
     {requiredPlates.map(requiredPlate => <li key={requiredPlate.weight}>{`${requiredPlate.count} x ${requiredPlate.weight}`}</li>)}
 </ul>
 {remainingWeightPerSide > 0 && <>
-You don't have enough plates! {remainingWeightPerSide} still needs to be added to each side.
+You don't have enough plates! {remainingWeightPerSide} {poundsMode ? 'LB' : 'KG'} still needs to be added to each side.
 </>}
 
             {/* {people.length == 0 && "Nobody added yet"}
