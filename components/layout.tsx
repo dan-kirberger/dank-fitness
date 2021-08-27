@@ -7,24 +7,18 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import { createMuiTheme, makeStyles, ThemeProvider } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import AccessibleForwardIcon from '@material-ui/icons/AccessibleForward';
-import MailIcon from "@material-ui/icons/Mail";
-import MenuIcon from "@material-ui/icons/Menu";
-import InboxIcon from "@material-ui/icons/MoveToInbox";
+import MenuIcon from '@material-ui/icons/Menu';
 import React from "react";
 import Link from 'next/link'
+import appTheme from '../styles/theme'
+import HomeIcon from '@material-ui/icons/Home';
 
 const drawerWidth = 240;
-
-const darkTheme = createMuiTheme({
-    palette: {
-        type: 'dark',
-    },
-});
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -61,8 +55,8 @@ const useStyles = makeStyles(theme => ({
 
 
 export const Layout = ({ children }) => {
-    const classes = useStyles(darkTheme);
-    const theme = darkTheme;
+    const classes = useStyles(appTheme);
+    const theme = appTheme;
     const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
 
     const [open, setOpen] = React.useState(false);
@@ -79,67 +73,60 @@ export const Layout = ({ children }) => {
     };
 
     return (
-        <ThemeProvider theme={theme}>
-            <div className={classes.root}>
-                <CssBaseline />
-                <AppBar position="fixed" className={classes.appBar}>
-                    <Toolbar>
-                        <IconButton
-                            color="inherit"
-                            aria-label="open drawer"
-                            edge="start"
-                            onClick={toggleDrawer}
-                            className={classes.menuButton}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Typography variant="h6" noWrap>
-                            <Link href="/">Dank Fitness</Link>
-                        </Typography>
-                    </Toolbar>
-                </AppBar>
-                <Drawer
-                    className={classes.drawer}
-                    variant={isMdUp ? "permanent" : "temporary"}
-                    classes={{
-                        paper: classes.drawerPaper
-                    }}
-                    anchor="left"
-                    open={open}
-                    onClose={toggleDrawer}
-                >
-                    <div className={classes.toolbar} />
-                    <Divider />
-                    <List>
-
-                        <ListItem button key={"Plate Calculator"} component="a" href="/tools/plates">
-                            <>
-                                <ListItemIcon>
-                                    <AccessibleForwardIcon />
-                                </ListItemIcon>
-                                <ListItemText primary={"Plate Calculator"} />
-                            </>
+        <div className={classes.root}>
+            <CssBaseline />
+            <AppBar position="fixed" className={classes.appBar}>
+                <Toolbar>
+                    <IconButton
+                        color="inherit"
+                        aria-label="open drawer"
+                        edge="start"
+                        onClick={toggleDrawer}
+                        className={classes.menuButton}
+                    >
+                        <MenuIcon />
+                    </IconButton>
+                    <Typography variant="h6" noWrap>
+                        <Link href="/">Dank Fitness</Link>
+                    </Typography>
+                </Toolbar>
+            </AppBar>
+            <Drawer
+                className={classes.drawer}
+                variant={isMdUp ? "permanent" : "temporary"}
+                classes={{
+                    paper: classes.drawerPaper
+                }}
+                anchor="left"
+                open={open}
+                onClose={toggleDrawer}
+            >
+                <div className={classes.toolbar} />
+                <Divider />
+                <List>
+                    <Link href="/" passHref>
+                        <ListItem button component="a">
+                            <ListItemIcon>
+                                <HomeIcon />
+                            </ListItemIcon>
+                            <ListItemText>Dank Fitness</ListItemText>
                         </ListItem>
-
-                    </List>
-                    <Divider />
-                    <List>
-                        {["All mail", "Trash", "Spam"].map((text, index) => (
-                            <ListItem button key={text}>
-                                <ListItemIcon>
-                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                                </ListItemIcon>
-                                <ListItemText primary={text} />
-                            </ListItem>
-                        ))}
-                    </List>
-                </Drawer>
-                <main className={classes.content}>
-                    <Toolbar />
-                    {children}
-                </main>
-            </div>
-        </ThemeProvider>
+                    </Link>
+                    <Link href="/tools/plates" passHref>
+                        <ListItem button component="a">
+                            <ListItemIcon>
+                                <AccessibleForwardIcon />
+                            </ListItemIcon>
+                            <ListItemText>Plate Calculator</ListItemText>
+                        </ListItem>
+                    </Link>
+                </List>
+            </Drawer>
+            <main className={classes.content}>
+                <Toolbar />
+                {children}
+            </main>
+        </div>
     );
 }
 

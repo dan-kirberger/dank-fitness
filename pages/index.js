@@ -4,18 +4,17 @@ import styles from '../styles/Home.module.css'
 
 export default function Home() {
   return (
-    <div className={styles.container}>
+    <div>
       <Head>
         <title>Dank Fitness</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
+      <main >
+        <h1>
           Welcome to DanK Fitness
         </h1>
-        <p>Pick a Tool:</p>
-        <ul><li><Link href="tools/plates">Plate Calculator</Link></li></ul>
+        <p>That left nav bar is pretty janky, have fun.</p>
       </main>
     </div>
   )
