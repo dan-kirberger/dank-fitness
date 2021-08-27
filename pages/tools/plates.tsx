@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Switch from '@material-ui/core/Switch'
 import { Button, Container, Grid, TextField } from '@material-ui/core'
+import _ from 'lodash'
 
 type PlateCalculatorProps = {
     people: Person[]
@@ -32,6 +33,8 @@ export const PlateCalculator = () => {
     const [poundsMode, setPoundsMode] = useState(true)
     const [people, setPeople] = useState([])
     const [plates, setPlates] = useState(generatePlates(poundsMode))
+    const [barbellWeight, setBarbellWeight] = useState(poundsMode ? 45 : 20)
+    const [desiredWeight, setDesiredWeight] = useState(poundsMode ? 135 : 75)
 
     const updatePlate = (weight, newCount) => {
         const updatedPlates = plates.map(existingPlate => {
@@ -43,35 +46,70 @@ export const PlateCalculator = () => {
         setPlates(updatedPlates)
     }
 
+    // TODO: assume/require even number of plates?
+
+    let remainingWeight = desiredWeight - barbellWeight
+    let remainingWeightPerSide = remainingWeight / 2
+    const availablePlates = plates.filter(plateType => plateType.count).sort((l,r) => r.weight - l.weight)
+    let requiredPlates : PlateType[] = []
+    availablePlates.forEach(plateType => {
+        if(remainingWeightPerSide >= plateType.weight) {
+            let numberOfPairsNeeded = 1
+            for(let numberOfPairs = 1; numberOfPairs <= plateType.count && (remainingWeightPerSide >= numberOfPairs * plateType.count); numberOfPairs++) {
+                numberOfPairsNeeded = numberOfPairs // lets make this slicker
+            }
+            remainingWeightPerSide = remainingWeightPerSide - (plateType.weight * numberOfPairsNeeded)
+            requiredPlates.push({...plateType, count: numberOfPairsNeeded})
+        }
+    })
+   
+
     return (
         <Container>
             <div>
                 Have to swap weights a lot for multiple people? Lets make that easier.
             </div>
-            <div>Current Mode: {poundsMode ? "LB" : "KG"}: <Switch checked={poundsMode} onChange={() => { setPoundsMode(!poundsMode); setPlates(generatePlates(!poundsMode)) }} /></div>
+            <div>Current Mode: {poundsMode ? "LB" : "KG"}: <Switch checked={poundsMode} onChange={() => { 
+                setPoundsMode(!poundsMode); 
+                setPlates(generatePlates(!poundsMode))
+                setBarbellWeight(!poundsMode ? 45 : 20 )
+                }} /></div>
 
             <p></p>
             These plates are available:
             <div>
                 <Grid container spacing={1}>
                     {plates.map(plate => {
-
                         return <Grid container key={plate.weight}>
                             <Grid item xs={2}>{plate.weight}</Grid>
-                            <Grid item xs={2}><TextField value={plate.count} type="number" label="Count" onChange={(e) => updatePlate(plate.weight, e.target.value)} /></Grid>
+                            <Grid item xs={2}><TextField value={plate.count} type="number" label="Pairs" onChange={(e) => updatePlate(plate.weight, e.target.value)} /></Grid>
                         </Grid>
                     })}
                 </Grid>
             </div>
 
+            <p/>
+            My bar weighs:<TextField value={barbellWeight} type="number" label="Barbell Weight" onChange={(e) => setBarbellWeight(e.target.value)} />
+
 <hr/>
-            {people.length == 0 && "Nobody added yet"}
+I need:<TextField value={desiredWeight} type="number" label="Desired Weight" onChange={(e) => setDesiredWeight(e.target.value)} />
+<hr/>
+You need:
+<ul>
+    <li>barbell ({barbellWeight})</li>
+    {requiredPlates.map(requiredPlate => <li key={requiredPlate.weight}>{`${requiredPlate.count} x ${requiredPlate.weight}`}</li>)}
+</ul>
+{remainingWeightPerSide > 0 && <>
+You don't have enough plates! {remainingWeightPerSide} still needs to be added to each side.
+</>}
+
+            {/* {people.length == 0 && "Nobody added yet"}
 
             {people.map(person => {
                 return <div key={person.name}>{person.name} - {person.weight}</div>
             })}
 
-            <NewUserForm setPeople={setPeople} />
+            <NewUserForm setPeople={setPeople} /> */}
 
         </Container>
     )
